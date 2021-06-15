@@ -14,6 +14,8 @@ var key = process.env.KEY;
 var encryptor = require('simple-encryptor')(key);
 var fs = require('fs')
 var url = require('url');
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr(process.env.CRYPT_KEY);
 
 
 const app = express()
@@ -53,6 +55,16 @@ app.get('/payment', (req, res) => {
     res.render("payment.ejs", { smallupi: requrl + '/smallupi', largeupi: requrl + '/largeupi' })
 })
 
+app.get('/apigen', (req, res) => {
+    res.render("api.ejs")
+})
+
+
+app.post('/api', urlencodedParser, function(req, res) {
+    var api = cryptr.encrypt(req.body.cloudid);
+    console.log(cryptr.decrypt(api));
+    res.send(JSON.stringify({ api : api}))
+})
 
 app.post('/paymentinfo', urlencodedParser, function(req, res) {
     var date = moment().format('MMMM Do YYYY, h:mm:ss a');
